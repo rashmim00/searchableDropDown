@@ -1,0 +1,101 @@
+@import "../../../style/variables";
+@import "../../../style/tooltip";
+
+.input-group {
+  max-width:100%;
+
+  .form-control {
+    color:#aaaaaa; //show text as light gray
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    border-right:0 transparent;
+    box-shadow:none; /* to remove last fainted line*/
+  }
+
+  .form-control[readonly] {
+    background-color: transparent;
+  }
+
+
+  .selected {
+    font-weight:bold; //show selection as bold
+    color:@bright-blue;
+  }
+
+  .input-group-addon {
+    border-left:0 transparent;
+    padding: 0 5px 0 0;
+    background:transparent;
+    box-shadow:none; /* to remove last fainted line*/
+  }
+}
+
+.showReqd {
+  border-left:5px solid @dark-red;
+}
+
+.validReqd {
+  border-left:5px solid @dark-green;
+  color : #555 !important; /*with border just want to show one style */
+}
+
+.clickable {
+  cursor:pointer;
+  color:#555;
+}
+
+.notClickable {
+  cursor:not-allowed;
+  color:#aaa;
+}
+
+.addPadding {
+  padding:5px; //for search box and checkbox
+}
+
+.show-menu {
+  display: block !important; //to open the ul - li list
+  max-height:300px;
+  overflow:auto; //show overflow
+  padding:0; //remove dropdown-menu added padding
+  width:100%;
+
+  input {
+    border:1px solid @light-blue; //show border around search box in dropdown
+  }
+
+  .btn {
+    outline:none; //remove outline
+    text-decoration:none; //remove blue underline
+    font-size:13px;
+  }
+
+  .divider {
+    margin:0px; //remove added margin-top by bootstrap
+  }
+
+  .form-control {
+    border-right:1px solid @light-blue;
+  }
+
+  .form-control-feedback {
+    margin:5px; //for search icon
+  }
+
+  li {
+    cursor: pointer; //clickable
+    padding: 0 3px 0 3px;
+    border-bottom:solid 1px @light-grey;
+  }
+
+  li.selected {
+    background-color: @light-blue;
+    font-weight:bold;
+  }
+
+  li.active {
+    background-color: #f4f5f7;
+    border-color: #f4f5f7;
+  }
+}
