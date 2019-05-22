@@ -47,18 +47,25 @@ export class SearchableDropDownComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         this.config = new SearchDropDownConfig(this.searchDropDownConfig);
         let d = this.config.list.find(item => item[this.config.idField] === this.config.defaultSelected) || {};
+        d['selected'] = true;
         this.displaySelected = this.config.title.concat(d[this.config.valueField]); //show default as title:default value
         this.idSelected = this.config.defaultSelected;
         this.tooltipText = this.displaySelected;
         this.selDropdownIndex = 0; //start of * default value
     }
 
-    @HostListener('document:click', ['$event'])
-    clickout(event) {
-        if (this.eRef.nativeElement.contains(event.target)) {
-            this.toggleList(false); //inside click
-        } else {
-            this.toggleList(true); //outside click
+    @HostListener('document:click', ['$event']) clickout(event) {
+        this.toggleList(true);
+    }
+
+    handleInsideClicks(event) {
+        if (event.target.className == 'caret' || event.target.className == 'input-group-addon clickable' || event.target.className =='form-control') {
+            this.toggleList(this.isOpen);
+            event.stopPropagation();
+        }
+        else if (event.target.className !== '') {
+            this.toggleList(false);
+            event.stopPropagation();
         }
     }
 
@@ -72,9 +79,6 @@ export class SearchableDropDownComponent implements OnChanges {
     /* bring selected item on top of the list */
     private selectedItemOnTop() {
         this.displayList = JSON.parse(JSON.stringify(this.config.list)); // deep copy list
-        let bringFront = this.displayList.find(item => item[this.config.idField] === this.idSelected); //selected item
-        this.displayList = this.displayList.filter(item => item[this.config.idField] !== this.idSelected); //rest of items
-        if (bringFront)this.displayList.unshift(bringFront); //add selected on top
         this.selDropdownIndex = 0;
     }
 
@@ -91,13 +95,13 @@ export class SearchableDropDownComponent implements OnChanges {
 
     //filter values if present anywhere in the string
     filterValues() {
-       return this.config.list.filter(item => item[this.config.valueField].toUpperCase().indexOf(this.matchWith.toUpperCase()) > -1);
+       return this.config.list.filter(item => item[this.config.idField].toUpperCase().indexOf(this.matchWith.toUpperCase()) > -1);
     }
 
     //if one value left on match then auto select it
     onMatchWithChange(){
         let v = this.filterValues();
-        if (v.length === 1) this.selectValue(v[0][this.config.valueField]);
+        if (v.length === 1) this.selectValue(v[0][this.config.idField]);
     }
 
     //track key up and down to update index
@@ -121,20 +125,21 @@ export class SearchableDropDownComponent implements OnChanges {
 
     /* select and emit the output */
     selectValue(value) {
-        this.isOpen = !this.isOpen;
-        this.idSelected = value;
         this.displaySelected = ""; //reset
-        if (value !== this.config.defaultSelected) {
-            this.config.list.filter((d, index) => {
-              if (d[this.config.idField] === value) {
-                  this.displaySelected = d[this.config.valueField];
-                  this.selDropdownIndex = index; //set to selected value
-              }
-            });
+        let sel = this.config.list.find(d => d[this.config.idField] === value); //find the selected value
+        sel['selected'] = !sel['selected']; //set as selected
+        let arr = this.config.list.filter(d => (d['selected'])) || []; //find all selected
+        if (arr.length > 1) {
+            arr = arr.filter(d => d[this.config.idField] !== this.config.defaultSelected); //remove default from selected list
+            let unselectDefault = this.config.list.find(d => d[this.config.idField] === this.config.defaultSelected);
+            unselectDefault['selected'] = false;
         }
+        this.idSelected = ''; //is not default so that selected color shows on input box
+        this.displaySelected = arr.map(e => e[this.config.valueField]).join("; "); //join them with space as display name has comma in it
         this.setDisplaySelected();
+        this.selectedItemOnTop();
         this.matchWith = ""; //reset match character
-        this.outDrop.emit(value); //emit output
+        this.outDrop.emit(arr.map(e => e[this.config.idField]).join(";")); //emit output. comma separated userids
     }
 
     /* Clear search input within dropdown and user selection */
@@ -142,6 +147,7 @@ export class SearchableDropDownComponent implements OnChanges {
         this.matchWith = ""; //reset
         this.idSelected = this.config.defaultSelected; //back to default
         this.displaySelected= ""; //reset
+        this.config.list.map(d => d['selected'] = (d[this.config.idField] == this.idSelected)); //reset list
         this.setDisplaySelected();
         this.selectedItemOnTop();
         this.outDrop.emit(this.idSelected); //emit output

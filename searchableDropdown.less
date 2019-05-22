@@ -54,6 +54,26 @@
   padding:5px; //for search box and checkbox
 }
 
+.badge {
+  margin: 5px;
+  background-color: transparent;
+  color: @bright-blue;
+  font-size: 14px;
+  border: 1px solid @bright-blue;
+  max-width: 70px;
+  width: 70px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding: 3px;
+}
+
+.badge-remove {
+  z-index:1000;
+  left:-1px;
+  color:@bright-red;
+  cursor:pointer;
+}
+
 .show-menu {
   display: block !important; //to open the ul - li list
   max-height:300px;
@@ -69,6 +89,7 @@
     outline:none; //remove outline
     text-decoration:none; //remove blue underline
     font-size:13px;
+    padding:3px;
   }
 
   .divider {
@@ -90,7 +111,7 @@
   }
 
   li.selected {
-    background-color: @light-blue;
+    background-color: transparent;
     font-weight:bold;
   }
 
